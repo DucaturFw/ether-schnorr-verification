@@ -3,6 +3,8 @@ const { soliditySHA3 } = require("ethereumjs-abi");
 const keccak = require("keccak");
 const Schnorr = artifacts.require("./Schnorr.sol");
 
+const bn = (s, base) => web3._extend.utils.toBigNumber(s, base);
+
 contract("Schorr test", function([owner]) {
   before(async function() {
     this.schnorr = await Schnorr.new();
@@ -55,32 +57,45 @@ contract("Schorr test", function([owner]) {
   });
 
   it("Should verify", async function() {
-    const sG = await this.schnorr.verify(
-      // bytes32 m,
-      "0xed6c11b0b5b808960df26f5bfc471d04c1995b0ffd2055925ad1be28d6baadfd",
-      // uint256 sig_s,
-      "86509482847631057038191587465017055017977147355932947858908944296808025263839",
-      // uint256 Xx,
-      "24736935343165825080282400575923847395594648488345738077476097451003541905756",
-      // uint256 Xy,
-      "40074007749932387633659148814363199224814536891319900959009249769662255181086",
-      // uint256 Rx,
-      "95348343281288161215188211927140077048917307991899458005404158061001536066017",
-      // uint256 Ry
-      "84050603013619111471897158401371302344388631458561673492169270465812410656747"
-    );
+    // console.log(new BN(100).toString("hex").padStart(64, "0"));
+    const prepare = (s, b = 10) =>
+      "0x" +
+      new BN(s, b)
+        .toBuffer("be")
+        .toString("hex")
+        .padStart(64, "0");
 
-    console.log(sG);
-
-    assert.isTrue(sG);
-    // assert.equal(
-    //   sG[0].toString(10),
-    //   "1169255046032939049243961028955714815525058502646315125950137448425092633725"
-    // );
-    // assert.equal(
-    //   sG[1].toString(10),
-    //   "36131219537015536641638718401883332340590662965828120376639484471408737903217"
-    // );
-    // console.log(sG);
+    const args = [
+      prepare(
+        "78979764221832073909817522700850834060635990401972146799911533383626801704681",
+        10
+      ),
+      // group key x,
+      prepare(
+        "24736935343165825080282400575923847395594648488345738077476097451003541905756",
+        10
+      ),
+      // group key y,
+      prepare(
+        "40074007749932387633659148814363199224814536891319900959009249769662255181086",
+        10
+      ),
+      // random point x,
+      prepare(
+        "95348343281288161215188211927140077048917307991899458005404158061001536066017",
+        10
+      ),
+      // random point y
+      prepare(
+        "84050603013619111471897158401371302344388631458561673492169270465812410656747",
+        10
+      ),
+      prepare(
+        "ed6c11b0b5b808960df26f5bfc471d04c1995b0ffd2055925ad1be28d6baadfd",
+        16
+      )
+    ];
+    const result = await this.schnorr.verify(args);
+    assert.isTrue(result);
   });
 });

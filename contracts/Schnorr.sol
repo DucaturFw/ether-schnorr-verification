@@ -11,14 +11,14 @@ contract Schnorr {
   }
 
   struct Verification {
-    Point X;
-    Point R;
-    uint256 S;
-    bytes32 M;
+    Point groupKey;
+    Point randomPoint;
+    uint256 signature;
+    bytes32 message;
 
-    uint256 Hash;
-    Point Left;
-    Point Right;
+    uint256 _hash;
+    Point _left;
+    Point _right;
   }
 
   constructor() {
@@ -63,21 +63,23 @@ contract Schnorr {
     return curve.ecadd(a.x, a.y, b.x, b.y);
   }
 
-  function verify(bytes32 m, uint256 sig_s, uint256 Xx, uint256 Xy, uint256 Rx, uint256 Ry) public view returns (bool) {
+  function verify(bytes32[6] _data)
+    public view returns (bool) {
+
     Verification memory state;
+    state.signature = uint256(_data[0]);
+    state.groupKey.x = uint256(_data[1]);
+    state.groupKey.y = uint256(_data[2]);
+    state.randomPoint.x = uint256(_data[3]);
+    state.randomPoint.y = uint256(_data[4]);
+    state.message = bytes32(_data[5]);
 
-    state.S = sig_s;
-    state.X.x = Xx;
-    state.X.y = Xy;
-    state.R.x = Rx;
-    state.R.y = Ry;
-    state.M = m;
+    state._hash = h(state.groupKey.x, state.groupKey.y, state.randomPoint.x, state.randomPoint.y, state.message);
+    (state._left.x, state._left.y) = sg(state.signature);
+    Point memory rightPart;
+    (rightPart.x, rightPart.y) = cmul(state.groupKey, state._hash);
+    (state._right.x, state._right.y) = cadd(state.randomPoint, rightPart);
 
-    state.Hash = h(state.R.x, state.R.y, state.X.x, state.X.y, state.M);
-    (state.Left.x, state.Left.y) = sg(sig_s);
-    (state.Right.x, state.Right.y) = cmul(state.X, state.Hash);
-    (state.Right.x, state.Right.y) = cadd(state.R, state.X);
-
-    return state.Left.x == state.Right.x && state.Left.y == state.Right.y;
+    return state._left.x == state._right.x && state._left.y == state._right.y;
   }
 }
