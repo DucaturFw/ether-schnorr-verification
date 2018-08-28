@@ -16,6 +16,7 @@
     "console": "truffle console",
     "compile": "truffle compile",
     "coverage": "scripts/coverage.sh",
+    "dev": "truffle develop",
     "version": "scripts/version.js"
   },
   "devDependencies": {
@@ -42,6 +43,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "bn.js": "^4.11.8",
     "openzeppelin-solidity": "OpenZeppelin/zeppelin-solidity"
   }
 }
