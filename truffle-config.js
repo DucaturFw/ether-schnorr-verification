@@ -1,13 +1,13 @@
 require("dotenv").config();
 
 const HDWalletProvider = require("truffle-hdwallet-provider-privkey");
-console.log(process.env.PRIVATE_KEY);
 const providerWithPrivateKey = (key, rpcEndpoint) =>
   new HDWalletProvider(key, rpcEndpoint);
 
 const infuraProvider = network =>
   providerWithPrivateKey(
-    process.env.PRIVATE_KEY,
+    process.env.PRIVATE_KEY ||
+      "2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501201",
     `https://${network}.infura.io/${process.env.INFURA_API_KEY}`
   );
 
