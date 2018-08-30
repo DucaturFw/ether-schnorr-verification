@@ -140,6 +140,13 @@ library Curve {
 		);
 	}
 
+	function G() pure internal returns (G1Point) {
+		return G1Point(
+			1,
+			2
+		);
+	}
+
 	/// @return the negation of p, i.e. p.add(p.negate()) should be zero.
 	function g1neg(G1Point p) pure internal returns (G1Point) {
 		// The prime q in the base field F_q for G1
