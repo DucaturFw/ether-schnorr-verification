@@ -11,14 +11,15 @@ contract SchnorrOptimized {
   }
 
   function verify(uint256[5] _musig, bytes32 _message) public view returns (bool) {
-    uint256 H = h(_musig[1], _musig[2], _musig[3], _musig[4], _message) % Curve.N();
+    uint256 H = h(_musig[1], _musig[2], _musig[3], _musig[4], _message);
     Curve.G1Point memory sG = Curve.g1mul(Curve.G(), _musig[0]);
     Curve.G1Point memory sV = Curve.g1add(
-      Curve.G1Point(_musig[3], _musig[4]), 
+      Curve.G1Point(_musig[1], _musig[2]), 
       Curve.g1mul(
-        Curve.G1Point(_musig[1], _musig[2]), H
+        Curve.G1Point(_musig[3], _musig[4]), H
       )
     );
+
     return sG.X == sV.X && sG.Y == sV.Y;
   }
 }
